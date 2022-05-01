@@ -8,6 +8,7 @@ const helmet = require("helmet");
 const morgan = require("morgan");
 const userRouter = require("./routes/users");
 const authRouter = require("./routes/auth");
+const postRouter = require("./routes/posts");
 
 dotenv.config();
 mongoose.connect(
@@ -29,6 +30,7 @@ app.use(morgan("common"));
 // ROUTES
 app.use("/api/users", userRouter);
 app.use("/api/auth", authRouter);
+app.use("/api/posts", postRouter);
 
 const port = process.env.PORT;
 app.listen(port, () => {
