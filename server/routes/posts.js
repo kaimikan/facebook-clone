@@ -71,9 +71,9 @@ router.get("/:id", async (req, res) => {
 });
 
 // GET TIMELINE POSTS
-router.get("/timeline/all", async (req, res) => {
+router.get("/timeline/:userID", async (req, res) => {
   try {
-    const currentUser = await User.findById(req.body.userID);
+    const currentUser = await User.findById(req.params.userID);
     const userPosts = await Post.find({ userID: currentUser._id });
     // we use promise since we will have multiple queries
     const friendPosts = await Promise.all(
@@ -82,6 +82,17 @@ router.get("/timeline/all", async (req, res) => {
       })
     );
     res.status(200).json(userPosts.concat(...friendPosts));
+  } catch (e) {
+    res.status(500).json(e);
+  }
+});
+
+// GET ALL USER POSTS
+router.get("/profile/:username", async (req, res) => {
+  try {
+    const user = await User.findOne({ username: req.params.username });
+    const posts = await Post.find({ userID: user._id });
+    res.status(200).json(posts);
   } catch (e) {
     res.status(500).json(e);
   }
