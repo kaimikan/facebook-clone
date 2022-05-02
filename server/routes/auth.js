@@ -39,21 +39,24 @@ router.post("/register", async (req, res) => {
 
 // LOGIN
 router.post("/login", async (req, res) => {
+  // if we try to login unsuccessfully we trigger an error due to multiple result calls
+  // (return prevents that behaviour making it one at most)
   try {
     const user = await User.findOne({ email: req.body.email });
-    // shorthand if statmement
-    !user && res.status(404).json("User not found.");
+    // // shorthand if statmement (without return)
+    // user && res.status(404).json("User not found.");
+    if (!user) return res.status(404).json("User not found.");
 
     const validPassword = await bcrypt.compare(
       req.body.password,
       user.password
     );
     // we usually don't tell which credential the user got wrong
-    !validPassword && res.status(400).json("Wrong password.");
+    if (!validPassword) return res.status(400).json("Wrong password.");
 
-    res.status(200).json(user);
+    return res.status(200).json(user);
   } catch (e) {
-    res.status(500).json(e);
+    return res.status(500).json(e);
   }
 });
 
