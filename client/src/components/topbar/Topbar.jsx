@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import "./topbar.css";
 // doing separate imports to not overload things by fetching the entire "@mui/icons-material" library
 import SearchIcon from "@mui/icons-material/Search";
@@ -6,8 +6,12 @@ import PersonIcon from "@mui/icons-material/Person";
 import ChatIcon from "@mui/icons-material/Chat";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import { Link } from "react-router-dom";
+import { AuthContext } from "../../context/AuthContext";
 
 export default function Topbar() {
+  const { user } = useContext(AuthContext);
+  const publicFolder = process.env.REACT_APP_PUBLIC_FOLDER;
+
   return (
     <div className="topbarContainer">
       <div className="topbarLeft">
@@ -40,7 +44,13 @@ export default function Topbar() {
             <span className="topbarIconBadge">1</span>
           </div>
         </div>
-        <img src="/assets/person/3.jpeg" alt="" className="topbarImage" />
+        <Link to={`/profile/${user.username}`}>
+          <img
+            src={publicFolder + (user.profilePicture || "person/noAvatar.png")}
+            alt=""
+            className="topbarImage"
+          />
+        </Link>
       </div>
     </div>
   );

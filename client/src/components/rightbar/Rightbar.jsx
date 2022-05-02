@@ -1,11 +1,25 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import "./rightbar.css";
-import { Users } from "../../dummyData";
 import Online from "../online/Online";
+import axios from "axios";
 
 /* profile is to check if we load the rightbar from the Home or from the Profile page */
 export default function Rightbar({ user }) {
   const publicFolder = process.env.REACT_APP_PUBLIC_FOLDER;
+  const [friends, setFriends] = useState([]);
+
+  useEffect(() => {
+    const getFriends = async () => {
+      try {
+        const friendList = await axios.get(`/users/friends/${user._id}`);
+        setFriends(friendList.data);
+      } catch (e) {
+        console.log(e);
+      }
+    };
+    getFriends();
+  }, [user._id]);
+
   const HomeRightbar = () => {
     return (
       <>
@@ -21,11 +35,11 @@ export default function Rightbar({ user }) {
         </div>
         <img className="rightbarAd" src={`${publicFolder}ad.png`} alt="" />
         <h4 className="rightbarTitle">Online Friends</h4>
-        <ul className="rightbarFriendList">
+        {/* <ul className="rightbarFriendList">
           {Users.map((user) => (
-            <Online key={user.id} user={user} />
+            <Online key={user._id} user={user} />
           ))}
-        </ul>
+        </ul> */}
       </>
     );
   };
@@ -59,14 +73,19 @@ export default function Rightbar({ user }) {
 
         <h4 className="rightbarTitle">User Friends</h4>
         <div className="rightbarFollowings">
-          <div className="rightbarFollowing">
-            <img
-              src="/assets/person/5.jpeg"
-              alt=""
-              className="rightbarFollowingImage"
-            />
-            <span className="rightbarFollowingName">Person Name</span>
-          </div>
+          {friends.map((friend) => (
+            <div className="rightbarFollowing">
+              <img
+                src={
+                  publicFolder +
+                  (friend.profilePicture || "person/noAvatar.png")
+                }
+                alt=""
+                className="rightbarFollowingImage"
+              />
+              <span className="rightbarFollowingName">{friend.username}</span>
+            </div>
+          ))}
         </div>
       </>
     );

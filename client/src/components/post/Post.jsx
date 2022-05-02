@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import "./post.css";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import axios from "axios";
 import { format } from "timeago.js";
 import { Link } from "react-router-dom";
+import { AuthContext } from "../../context/AuthContext";
 
 export default function Post({ post }) {
   const [reactions, setReactions] = useState(post.likes.length);
@@ -11,6 +12,13 @@ export default function Post({ post }) {
   const [user, setUser] = useState({});
   const publicFolder = process.env.REACT_APP_PUBLIC_FOLDER;
   console.log(publicFolder);
+  // we change name to avoit conflict with state user
+  const { user: currentUser } = useContext(AuthContext);
+
+  // we make sure to avoid mismatch between client and server data
+  useEffect(() => {
+    setIsReacted(post.likes.includes(currentUser._id));
+  }, [currentUser._id, post.likes]);
 
   // fetch posts once on render
   useEffect(() => {
@@ -23,6 +31,9 @@ export default function Post({ post }) {
   }, [post.userID]);
 
   const reactionHandler = () => {
+    try {
+      axios.put(`/posts/${post._id}/like`, { userID: currentUser._id });
+    } catch (e) {}
     setReactions(isReacted ? reactions - 1 : reactions + 1);
     setIsReacted(!isReacted);
   };
